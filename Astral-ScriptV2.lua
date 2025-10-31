@@ -25,7 +25,7 @@ local game_scripts = {
         ["Dexxterscripts"] = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/DexxterScripts/Roblox/main/DeadRails.lua"))() end
     },
     ["hypershot"] = {
-        ["zephyrhub"] = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/ZephyrOnTop/Main/refs/heads/main/Main"))()
+        ["zephyrhub"] = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/ZephyrOnTop/Main/refs/heads/main/Main"))() end
     },
     ["kings legacy"] = {
         ["fazium"] = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/ZaRdoOx/Fazium-files/main/Loader"))() end
@@ -40,23 +40,25 @@ local game_scripts = {
         ["plutonium hub"] = function()  loadstring(game:HttpGet("https://raw.githubusercontent.com/PawsThePaw/Plutonium.AA/main/Plutonium.Loader.lua", true))() end
     },
     ["evade"] = {
-        ["random"] = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/marcelosero7-cyber/Algolevade/refs/heads/main/obfuscated.lua%20(13).txt"))()
+        ["random"] = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/marcelosero7-cyber/Algolevade/refs/heads/main/obfuscated.lua%20(13).txt"))() end
     },
     ["forsaken"] = {
         ["vapevoidware"] = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/loader.lua", true))() end
     },
     ["guts and blackpowder"] = {
-        ["random"] = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/XaviscoZ/roblox/refs/heads/main/g%26b.lua"))()
+        ["random"] = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/XaviscoZ/roblox/refs/heads/main/g%26b.lua"))() end
     },
     ["hunty zombies"] = {
         ["kaisenlmao"] = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/kaisenlmao/loader/refs/heads/main/chiyo.lua"))() end
     },
     ["ink games"] = {
-        ["vapevoidware"] = function() shared.CustomCommit = "8dd5a2e401a7624d73c2fbf1cd3376ff9d363b89"
-shared.TestingMode = true
-shared.StagingMode = true
-shared.BYPASS_VW_PROTECTION = true
-loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/inkgame.lua", true))() end
+        ["vapevoidware"] = function() 
+            shared.CustomCommit = "8dd5a2e401a7624d73c2fbf1cd3376ff9d363b89"
+            shared.TestingMode = true
+            shared.StagingMode = true
+            shared.BYPASS_VW_PROTECTION = true
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/inkgame.lua", true))() 
+        end
     },
     ["jailbreak"] = {
         ["xChaoticvoid"] = function() loadstring(game:HttpGet(('https://raw.githubusercontent.com/xChaoticVoid/Jailbreak/main/Chaos.lua'), true))() end
@@ -76,8 +78,11 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/m
     ["mad city"] = {
         ["VMChub"] = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/inkdupe/scripts/refs/heads/main/VMChub.lua"))() end
     },
-    ["atherhub"] = function() loadstring(game:HttpGet("https://rawscripts.net/raw/Bounty-Hunter-Anime-Eternal-AtherHub-OVERPOWERED-KILL-ALL-AUTO-DUNGEON-60619"))() end
+    ["bounty hunter anime eternal"] = {
+        ["atherhub"] = function() loadstring(game:HttpGet("https://rawscripts.net/raw/Bounty-Hunter-Anime-Eternal-AtherHub-OVERPOWERED-KILL-ALL-AUTO-DUNGEON-60619"))() end
+    }
 }
+
 local main_scripts = {
     ["Rifton"] = function() loadstring(game:HttpGet("https://rifton.top/loader.lua"))() end,
     ["NOLAG Hub"] = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/yomiytg/NOLAGHUB/refs/heads/main/Grow%20A%20Gardern"))() end,
@@ -229,5 +234,4 @@ for _, name in ordered_fun_scripts do
             starlight:Destroy()
         end,
     }, name)
-
 end
