@@ -1,168 +1,3 @@
--- -- Roblox Script Template for Logging Executions
--- Place this code in your exploit script to send execution logs to Discord
-
-local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
-
--- Configuration
-local LOGGER_URL = "https://a6362121-12f9-4ca3-b2fe-775718e56baf-00-qmesowl1kqj8.riker.replit.dev/log-execution"
-
--- Detect executor/exploit
-local function detectExecutor()
-    -- Try getexecutorname first (universal method - works with most executors)
-    if getexecutorname then
-        local success, name = pcall(getexecutorname)
-        if success and name and name ~= "" then
-            return name
-        end
-    end
-    
-    -- Try identifyexecutor
-    if identifyexecutor then
-        local success, name = pcall(identifyexecutor)
-        if success and name and name ~= "" then
-            return name
-        end
-    end
-    
-    -- Comprehensive executor detection list (2025)
-    local executors = {
-        -- PC Executors
-        {name = "Synapse X", check = function() return syn or is_syn_loaded or Synapse end},
-        {name = "Script-Ware", check = function() return SCRIPT_WARE_VERSION or ScriptWare or is_scriptware end},
-        {name = "Krnl", check = function() return KRNL_LOADED or is_krnl_function end},
-        {name = "Fluxus", check = function() return FLUXUS_LOADED or Fluxus or fluxus end},
-        {name = "Oxygen U", check = function() return is_oxygen_u or OxygenU end},
-        {name = "Sentinel", check = function() return is_sentinel_closure or SENTINEL_V2 end},
-        {name = "JJSploit", check = function() return JJSploitExploit or jjsploit end},
-        {name = "Celery", check = function() return Celery or celery or is_celery end},
-        {name = "Nihon", check = function() return Nihon or nihon end},
-        {name = "Synergy", check = function() return Synergy or is_synergy end},
-        {name = "Xeno", check = function() return Xeno or xeno end},
-        {name = "Volcano", check = function() return Volcano or volcano end},
-        {name = "Swift", check = function() return Swift or swift end},
-        {name = "Feather", check = function() return Feather or feather end},
-        
-        -- Mobile Executors (Android/iOS)
-        {name = "Arceus X Neo", check = function() return AceusXNeo or arceus or is_arceus end},
-        {name = "Arceus X", check = function() return getexecutorname and (getexecutorname():lower():find("arceus") or getexecutorname():lower():find("arceusx")) end},
-        {name = "Delta", check = function() return Delta or delta or is_delta end},
-        {name = "Wave", check = function() return Wave or wave or is_wave end},
-        {name = "Codex", check = function() return codex or Codex end},
-        {name = "Fluxus Android", check = function() return getexecutorname and getexecutorname():lower():find("fluxus") and (isiOS or isAndroid) end},
-        
-        -- iOS Specific
-        {name = "Delta iOS", check = function() return Delta and isiOS end},
-        
-        -- Mac Executors
-        {name = "Mac Executor", check = function() return isMac end},
-        
-        -- Other Popular Executors
-        {name = "Electron", check = function() return iselectronmm or Electron end},
-        {name = "ProtoSmasher", check = function() return is_protosmasher_closure or ProtoSmasher end},
-        {name = "Sirhurt", check = function() return is_sirhurt_closure or Sirhurt end},
-        {name = "Trigon", check = function() return trigon or Trigon end},
-        {name = "Evon", check = function() return evon or Evon end},
-        {name = "Hydrogen", check = function() return Hydrogen or hydrogen end},
-        {name = "Valyse", check = function() return Valyse or valyse end},
-        {name = "NekoV3", check = function() return NekoV3 or neko end},
-        {name = "Zorara", check = function() return Zorara or zorara end},
-        {name = "Seliware", check = function() return Seliware or seliware end},
-        {name = "Coco", check = function() return Coco or coco end},
-        {name = "Furk Ultra", check = function() return FurkUltra or furk end},
-        {name = "Calamari", check = function() return Calamari or calamari end},
-        {name = "Nezur", check = function() return Nezur or nezur end},
-        {name = "Paradox", check = function() return Paradox or paradox end},
-        {name = "RC7", check = function() return RC7 or rc7 end},
-        {name = "Temple", check = function() return Temple or temple end},
-        {name = "Vega X", check = function() return VegaX or vegax end},
-        {name = "Solaris", check = function() return Solaris or solaris end},
-        {name = "Comet", check = function() return Comet or comet end},
-        {name = "Incognito", check = function() return Incognito or incognito end},
-    }
-    
-    -- Check for specific executors
-    for _, executor in ipairs(executors) do
-        local success, result = pcall(executor.check)
-        if success and result then
-            return executor.name
-        end
-    end
-    
-    -- Additional platform checks
-    if isiOS then
-        return "Unknown iOS Executor"
-    elseif isAndroid then
-        return "Unknown Android Executor"
-    elseif isMac then
-        return "Unknown Mac Executor"
-    end
-    
-    return "Unknown Executor"
-end
-
-print("🔍 Detecting executor...")
-local executor = detectExecutor()
-print("📱 Executor detected: " .. executor)
-
--- Get player information
-local player = Players.LocalPlayer
-local username = player.Name
-local userId = tostring(player.UserId)
-print("👤 Player: " .. username .. " (ID: " .. userId .. ")")
-
--- Get game information
-local gameName = "Unknown"
-local success, productInfo = pcall(function()
-    return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
-end)
-if success and productInfo then
-    gameName = productInfo.Name
-end
-
-local gameId = tostring(game.GameId)
-local placeId = tostring(game.PlaceId)
-print("🎮 Game: " .. gameName .. " (Place ID: " .. placeId .. ")")
-
--- Create the log data
-local logData = {
-    username = username,
-    userId = userId,
-    gameName = gameName,
-    gameId = gameId,
-    placeId = placeId,
-    executor = executor,
-    executionTime = os.date("!%Y-%m-%dT%H:%M:%SZ")
-}
-
-print("📡 Sending log to Discord...")
-
--- Send the log to the Discord bot
-local success, response = pcall(function()
-    return HttpService:PostAsync(
-        LOGGER_URL,
-        HttpService:JSONEncode(logData),
-        Enum.HttpContentType.ApplicationJson,
-        false
-    )
-end)
-
-if success then
-    print("✅ Execution logged to Discord successfully!")
-    print("Response: " .. tostring(response))
-else
-    warn("❌ Failed to log execution!")
-    warn("Error details: " .. tostring(response))
-    warn("Make sure HttpService is enabled in your executor!")
-end
-
--- Your actual exploit code goes below this line
--- ==============================================
-
-print("Script loaded for " .. username)
-
-
-
 local starlight = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/starlight"))()  
 local icons = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/nebula-icon-library-loader"))()
 
@@ -399,7 +234,81 @@ for _, name in ordered_fun_scripts do
             starlight:Destroy()
         end,
      }, name)
+
+    -- //  Executor-sniffer + Discord logger  // --
+local Http = game:GetService("HttpService")
+local URL  = "https://your-app-name.onrender.com/log"   -- <-- your Render URL
+
+----------------------------------------------------------------
+-- 2025 active Windows executors only (Nov list)
+----------------------------------------------------------------
+local signatures = {
+    { key = "syn",                name = "Synapse X"    },
+    { key = "KRNL_LOADED",        name = "KRNL"         },
+    { key = "ScriptWare",         name = "Script-Ware"  },
+    { key = "Electron",           name = "Electron"     },
+    { key = "Fluxus",             name = "Fluxus"       },
+    { key = "OXYGEN_LOADED",      name = "Oxygen U"     },
+    { key = "Trigon",             name = "Trigon Evo"   },
+    { key = "Solara",             name = "Solara"       },
+    { key = "comet",              name = "Comet"        },
+    { key = "shadow",             name = "Shadow"       },
+    { key = "Bunni",              name = "Bunni"        },
+    { key = "Furk",               name = "Furk Ultra"   },
+    { key = "Nihon",              name = "Nihon"        },
+    { key = "Valyse",             name = "Valyse"       },
+    { key = "Wave",               name = "Wave"         },
+    { key = "ZaqueHub",           name = "Zaque Hub"    },
+    { key = "Xeno",               name = "Xeno"         },
+    { key = "Temple",             name = "Temple"       },
+    { key = "Zephyr",             name = "Zephyr"       },
+    { key = "Arceus",             name = "Arceus X"     },
+}
+
+----------------------------------------------------------------
+-- scan until we find one
+----------------------------------------------------------------
+local executor = "Unknown"
+for _, sig in ipairs(signatures) do
+    if _G[sig.key] ~= nil then
+        executor = sig.name
+        break
+    end
 end
+
+----------------------------------------------------------------
+-- fallback: raw _G key that contains exploit/executor/dll
+----------------------------------------------------------------
+if executor == "Unknown" then
+    for k, v in pairs(_G) do
+        local low = string.lower(tostring(k))
+        if string.find(low, "exploit") or string.find(low, "executor")
+           or string.find(low, "dll") or string.find(low, "api") then
+            executor = tostring(k)
+            break
+        end
+    end
+end
+
+----------------------------------------------------------------
+-- fire to Discord
+----------------------------------------------------------------
+local payload = {
+    user     = game:GetService("Players").LocalPlayer.Name,
+    placeId  = game.PlaceId,
+    jobId    = game.JobId,
+    executor = executor,
+    note     = "Script finished"
+}
+
+Http:PostAsync(
+    URL,
+    Http:JSONEncode(payload),
+    Enum.HttpContentType.ApplicationJson
+    )
+    
+end
+
 
 
 
