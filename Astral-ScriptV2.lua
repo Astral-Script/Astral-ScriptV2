@@ -1,3 +1,62 @@
+-- Roblox Script Template for Logging Executions
+-- Place this code in your exploit script to send execution logs to Discord
+
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+
+-- Configuration
+local LOGGER_URL = "https://a6362121-12f9-4ca3-b2fe-775718e56baf-00-qmesowl1kqj8.riker.replit.dev/log-execution"
+
+-- Get player information
+local player = Players.LocalPlayer
+local username = player.Name
+local userId = tostring(player.UserId)
+
+-- Get game information
+local gameName = "Unknown"
+local success, productInfo = pcall(function()
+    return game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
+end)
+if success and productInfo then
+    gameName = productInfo.Name
+end
+
+local gameId = tostring(game.GameId)
+local placeId = tostring(game.PlaceId)
+
+-- Create the log data
+local logData = {
+    username = username,
+    userId = userId,
+    gameName = gameName,
+    gameId = gameId,
+    placeId = placeId,
+    executionTime = os.date("!%Y-%m-%dT%H:%M:%SZ")
+}
+
+-- Send the log to the Discord bot
+local success, response = pcall(function()
+    return HttpService:PostAsync(
+        LOGGER_URL,
+        HttpService:JSONEncode(logData),
+        Enum.HttpContentType.ApplicationJson,
+        false
+    )
+end)
+
+if success then
+    print("✅ Execution logged to Discord successfully!")
+else
+    warn("❌ Failed to log execution:", response)
+end
+
+-- Your actual exploit code goes below this line
+-- ==============================================
+
+print("Script loaded for " .. username)
+
+
+
 local starlight = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/starlight"))()  
 local icons = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/nebula-icon-library-loader"))()
 
@@ -235,5 +294,6 @@ for _, name in ordered_fun_scripts do
         end,
      }, name)
 end
+
 
 
