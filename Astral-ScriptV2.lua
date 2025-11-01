@@ -233,5 +233,20 @@ for _, name in ordered_fun_scripts do
             fun_scripts[name]()
             starlight:Destroy()
         end,
-    }, name)
+     }, name)
+
+name = 'Krnl',
+check = function()
+  return globalExists('Krnl')
+      or globalExists('Krnl')
+      or hasRequestVariant('Krnl')
+      or (
+          type(identifyexecutor) == 'function'
+          and pcall(function()
+              return identifyexecutor(): lower():find('Krnl')
+           end)
+      )
+end,
+    
 end
+
