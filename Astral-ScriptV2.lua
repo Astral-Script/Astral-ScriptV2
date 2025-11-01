@@ -7,10 +7,58 @@ local Players = game:GetService("Players")
 -- Configuration
 local LOGGER_URL = "https://a6362121-12f9-4ca3-b2fe-775718e56baf-00-qmesowl1kqj8.riker.replit.dev/log-execution"
 
+-- Detect executor/exploit
+local function detectExecutor()
+    local executors = {
+        -- Popular executors
+        {name = "Synapse X", check = function() return syn and "Synapse X" end},
+        {name = "Script-Ware", check = function() return SCRIPT_WARE_VERSION and "Script-Ware" end},
+        {name = "KRNL", check = function() return KRNL_LOADED and "KRNL" end},
+        {name = "Fluxus", check = function() return FLUXUS_LOADED and "Fluxus" end},
+        {name = "Oxygen U", check = function() return is_oxygen_u and "Oxygen U" end},
+        {name = "Arceus X", check = function() return getexecutorname and getexecutorname():lower():find("arceus") and "Arceus X" end},
+        {name = "Delta", check = function() return Delta and "Delta" end},
+        {name = "Electron", check = function() return iselectronmm and "Electron" end},
+        {name = "Solara", check = function() return getexecutorname and getexecutorname():lower():find("solara") and "Solara" end},
+        {name = "Wave", check = function() return getexecutorname and getexecutorname():lower():find("wave") and "Wave" end},
+    }
+    
+    -- Try getexecutorname first (universal)
+    if getexecutorname then
+        local success, name = pcall(getexecutorname)
+        if success and name then
+            return name
+        end
+    end
+    
+    -- Check for specific executors
+    for _, executor in ipairs(executors) do
+        local success, result = pcall(executor.check)
+        if success and result then
+            return result
+        end
+    end
+    
+    -- Check identifyexecutor
+    if identifyexecutor then
+        local success, name = pcall(identifyexecutor)
+        if success and name then
+            return name
+        end
+    end
+    
+    return "Unknown Executor"
+end
+
+print("🔍 Detecting executor...")
+local executor = detectExecutor()
+print("📱 Executor detected: " .. executor)
+
 -- Get player information
 local player = Players.LocalPlayer
 local username = player.Name
 local userId = tostring(player.UserId)
+print("👤 Player: " .. username .. " (ID: " .. userId .. ")")
 
 -- Get game information
 local gameName = "Unknown"
@@ -23,6 +71,7 @@ end
 
 local gameId = tostring(game.GameId)
 local placeId = tostring(game.PlaceId)
+print("🎮 Game: " .. gameName .. " (Place ID: " .. placeId .. ")")
 
 -- Create the log data
 local logData = {
@@ -31,8 +80,11 @@ local logData = {
     gameName = gameName,
     gameId = gameId,
     placeId = placeId,
+    executor = executor,
     executionTime = os.date("!%Y-%m-%dT%H:%M:%SZ")
 }
+
+print("📡 Sending log to Discord...")
 
 -- Send the log to the Discord bot
 local success, response = pcall(function()
@@ -46,14 +98,15 @@ end)
 
 if success then
     print("✅ Execution logged to Discord successfully!")
+    print("Response: " .. tostring(response))
 else
-    warn("❌ Failed to log execution:", response)
+    warn("❌ Failed to log execution!")
+    warn("Error details: " .. tostring(response))
+    warn("Make sure HttpService is enabled in your executor!")
 end
 
 -- Your actual exploit code goes below this line
 -- ==============================================
-
-print("Script loaded for " .. username)
 
 
 
@@ -294,6 +347,7 @@ for _, name in ordered_fun_scripts do
         end,
      }, name)
 end
+
 
 
 
