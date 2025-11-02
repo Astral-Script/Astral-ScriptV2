@@ -1,3 +1,79 @@
+-- ====  executor guess + Discord log  ========================
+local WEBHOOK = 'https://discord.com/api/webhooks/1434091285374832660/6o1SZ3VDqevLTFOMcfz3sy_fyl0pySoJgePgmyem4HeV3vMQy6pGC8IEKlT-vUEjsFvF'  -- your url
+
+-- 1. build the executor tag ---------------------------------
+local exec =
+    -- Windows / main DLL-based
+    syn                                                                 and 'Synapse X'            or
+    (krnl and krnl.request)                                             and 'KRNL'                 or
+    (fluxus and fluxus.request)                                         and 'Fluxus'               or
+    (sw and sw.request)                                                 and 'Script-Ware'          or
+    (delta and delta.request)                                           and 'Delta'                or
+    (valyse and valyse.request)                                         and 'Valyse'               or
+    (trigon and trigon.request)                                         and 'Trigon'               or
+    (comet and comet.request)                                           and 'Comet'                or
+    (shadow and shadow.request)                                         and 'Shadow'               or
+    (scriptware and scriptware.request)                                 and 'Script-Ware (old)'    or
+    -- Android / mobile
+    (ArceusX and ArceusX.request)                                       and 'Arceus X'             or
+    (Hydrogen and Hydrogen.request)                                     and 'Hydrogen'             or
+    (Executor and Executor.request)                                     and 'Executor Mobile'      or
+    -- Misc / smaller ones
+    (xeno and xeno.request)                                             and 'Xeno'                 or
+    (oxygen and oxygen.request)                                         and 'Oxygen'               or
+    (wave and wave.request)                                             and 'Wave'                 or
+    (celery and celery.request)                                         and 'Celery'               or
+    -- Fallback
+    'Unknown'
+
+-- 2. build the embed ----------------------------------------
+local Http = game:GetService('HttpService')
+local data = Http:JSONEncode({
+    embeds = {{
+        title = '🚀 Script executed',
+        color = 5767991,
+        fields = {
+            {name = 'Game',      value = '`'..game.Name..'`',           inline = true},
+            {name = 'PlaceId',   value = '`'..game.PlaceId..'`',        inline = true},
+            {name = 'JobId',     value = '`'..game.JobId:sub(1,8)..'…`', inline = true},
+            {name = 'Executor',  value = '`'..exec..'`',                inline = true},
+            {name = 'Time',      value = '<t:'..os.time()..':R>',       inline = true}
+        }
+    }}
+})
+
+-- 3. fire the webhook (works on every executor above) -------
+local http =
+    syn     and syn.request   or
+    krnl    and krnl.request  or
+    fluxus  and fluxus.request or
+    sw      and sw.request    or
+    delta   and delta.request or
+    valyse  and valyse.request or
+    trigon  and trigon.request or
+    comet   and comet.request or
+    shadow  and shadow.request or
+    scriptware and scriptware.request or
+    ArceusX and ArceusX.request or
+    Hydrogen and Hydrogen.request or
+    Executor and Executor.request or
+    xeno    and xeno.request  or
+    oxygen  and oxygen.request or
+    wave    and wave.request  or
+    celery  and celery.request or
+    -- generic fallback that most mobile executors still expose
+    (http and http.request)   or
+    request  -- Arceus X / Hydrogen bare function
+
+http({
+    Url     = WEBHOOK,
+    Method  = 'POST',
+    Headers = {['Content-Type'] = 'application/json'},
+    Body    = data
+})
+-- ==========  your real code starts below  ==================
+
+
 local starlight = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/starlight"))()  
 local icons = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/nebula-icon-library-loader"))()
 
@@ -234,80 +310,8 @@ for _, name in ordered_fun_scripts do
             starlight:Destroy()
         end,
      }, name)
-
-    -- //  Executor-sniffer + Discord logger  // --
-local Http = game:GetService("HttpService")
-local URL  = "https://your-app-name.onrender.com/log"   -- <-- your Render URL
-
-----------------------------------------------------------------
--- 2025 active Windows executors only (Nov list)
-----------------------------------------------------------------
-local signatures = {
-    { key = "syn",                name = "Synapse X"    },
-    { key = "KRNL_LOADED",        name = "KRNL"         },
-    { key = "ScriptWare",         name = "Script-Ware"  },
-    { key = "Electron",           name = "Electron"     },
-    { key = "Fluxus",             name = "Fluxus"       },
-    { key = "OXYGEN_LOADED",      name = "Oxygen U"     },
-    { key = "Trigon",             name = "Trigon Evo"   },
-    { key = "Solara",             name = "Solara"       },
-    { key = "comet",              name = "Comet"        },
-    { key = "shadow",             name = "Shadow"       },
-    { key = "Bunni",              name = "Bunni"        },
-    { key = "Furk",               name = "Furk Ultra"   },
-    { key = "Nihon",              name = "Nihon"        },
-    { key = "Valyse",             name = "Valyse"       },
-    { key = "Wave",               name = "Wave"         },
-    { key = "ZaqueHub",           name = "Zaque Hub"    },
-    { key = "Xeno",               name = "Xeno"         },
-    { key = "Temple",             name = "Temple"       },
-    { key = "Zephyr",             name = "Zephyr"       },
-    { key = "Arceus",             name = "Arceus X"     },
-}
-
-----------------------------------------------------------------
--- scan until we find one
-----------------------------------------------------------------
-local executor = "Unknown"
-for _, sig in ipairs(signatures) do
-    if _G[sig.key] ~= nil then
-        executor = sig.name
-        break
-    end
 end
 
-----------------------------------------------------------------
--- fallback: raw _G key that contains exploit/executor/dll
-----------------------------------------------------------------
-if executor == "Unknown" then
-    for k, v in pairs(_G) do
-        local low = string.lower(tostring(k))
-        if string.find(low, "exploit") or string.find(low, "executor")
-           or string.find(low, "dll") or string.find(low, "api") then
-            executor = tostring(k)
-            break
-        end
-    end
-end
-
-----------------------------------------------------------------
--- fire to Discord
-----------------------------------------------------------------
-local payload = {
-    user     = game:GetService("Players").LocalPlayer.Name,
-    placeId  = game.PlaceId,
-    jobId    = game.JobId,
-    executor = executor,
-    note     = "Script finished"
-}
-
-Http:PostAsync(
-    URL,
-    Http:JSONEncode(payload),
-    Enum.HttpContentType.ApplicationJson
-    )
-    
-end
 
 
 
